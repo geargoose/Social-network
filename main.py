@@ -124,8 +124,11 @@ def feed():
                     filename = secure_filename(
                         f'{str(time.time()).replace(".", "-")}-{file.filename}')
                     ftype = ''
-                    if filename.endswith(  # Определяем тип файла для корректного отображения в браузере
-                            ('.png', '.jpg', '.jpeg', '.bmp', '.mp4', '.mov', '.avi', '.wav', '.mp3', '.ogg')):
+                    if filename.endswith('png') or filename.endswith('jpg') \
+                            or filename.endswith('jpeg') or filename.endswith('bmp') \
+                            or filename.endswith('mp4') or filename.endswith('mov') \
+                            or filename.endswith('avi') or filename.endswith('wav') \
+                            or filename.endswith('mp3'):
                         ftype = 'media'
                     attachments.append(f'{ftype}{filename}')
                     # print(filename)
