@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+<!--
+Страница "новости" или домашняя страница
+
+На этой странице отображены новости от всех пользователей. Из базы данных выбираются все не скрытые новости,
+а затем сортируются по дате. Похожим образом обрабатываются и комментарии для каждой новости.
+-->
+
+{% block content %}
+<div class="card" style="margin-top: 5px;" id="new">
+    <div class="card-header d-flex justify-content-between align-items-center" style="padding: 5px;">
+        {% if current_user.is_authenticated %}
+        <div class="p-2">
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#AddNewsFeedSpoiler"
+                    aria-expanded="false" aria-controls="AddNewsFeedSpoiler">
+                Добавить новость
+            </button>
+        </div>
+        <div class="p-2">
+            Привет, {{current_user.name}}!
+        </div>
+        <div class="p-2">
+            <a href="news" class="btn btn-secondary btn-sm">Редактор новостей</a>
+        </div>
+        {% else %}
+        <div class="p-2">
+            <a href="/register">Зарегистрируйтесь</a> или <a href="/login">войдите</a> чтобы добавить новость.
+        </div>
+        {% endif %}
+    </div>
+    {% if current_user.is_authenticated %}
+    <div class="collapse" id="AddNewsFeedSpoiler">
+
+        <div class="card-body">
+
+            <form action="" method="post" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <p style="margin-bottom: 0px">
+                    {{ form.title.label }}<br>
+                    {{ form.title(class="form-control") }}<br>
+                    {% for error in form.title.errors %}
+                <p class="alert alert-danger" role="alert">
+                    {{ error }}
+                </p>
+                {% endfor %}
+                </p>
+                <p style="margin-bottom: 0px">
+                    {{ form.content.label }}<br>
+                    {{ form.content(class="form-control") }}<br>
+                    {% for error in form.content.errors %}
+                <p content="alert alert-danger" role="alert">
+                    {{ error }}
+                </p>
+                {% endfor %}
+                </p>
+                <p>
+                    {{ form.file.label }}<br>
+                    {{ form.file(class="form-control") }}<br>
+                    {% for error in form.content.errors %}
+                <p content="alert alert-danger" role="alert">
+                    {{ error }}
+                </p>
+                {% endfor %}
+                </p>
+                <p style="margin-bottom: 0px">{{ form.is_private() }} {{ form.is_private.label }}</p>
+                <p style="margin-bottom: 0px">{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+                {{message}}
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+
+{% for item in news %}
+{% set liked = item.liked_by.split('|') %}
+<div class="card" style="margin-top: 5px;" id="{{ item.id }}">
+    <div class="card-header d-flex justify-content-between align-items-center" style="padding: 5px;">
+        <div class="p-2">
+            <img src="/static/userpics/{{ item.user.id }}.png" width="40px" height="40px" style="border-radius: 20px">
+            {% if item.user.is_admin %}
+            <a href="/{{ item.user.id }}" class="btn btn-outline-danger btn-sm"
+               title="Пользователь является Администратором">{{item.user.name}}</a>
+            {% else %}
+            <a href="/{{ item.user.id }}" class="btn btn-outline-primary btn-sm" title="Перейти к профилю">{{item.user.name}}</a>
+            {% endif %}
+            {% if item.user.is_group %}
+            <a href="/{{ item.user.id }}" class="btn btn-outline-success btn-sm"
+               title="Группа. Новости от имени группы могут публиковать один или несколько человек"><i class="fas fa-users"></i></a>
+            {% endif %}
+            {% if item.user.is_confirmed %}
+            <a href="/{{ item.user.id }}" class="btn btn-outline-warning btn-sm" title="Официальный пользователь/группа"><i class="fas fa-star"></i></a>
+            {% endif %}
+            {% if item.is_private %}
+            <button type="button" class="btn btn-outline-dark btn-sm">Скрытая новость</button>
+            {% endif %}
+        </div>
+        <div class="p-2">{{item.created_date}}</div>
+        <div class="p-2">
+            <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Действия
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    {% if current_user.is_authenticated and ((current_user == item.user) or current_user.is_admin) %}
+                    <a href="/news/{{ item.id }}" class="dropdown-item">Изменить</a>
+                    <a href="/news/delete/{{ item.id }}" class="dropdown-item">Удалить</a>
+                    {% endif %}
+                    {% if current_user.is_authenticated %}
+                    <a href="/news/like/{{ item.id }}" class="dropdown-item">Отметить</a>
+                    {% endif %}
+                    <a href="/#{{ item.id }}" class="dropdown-item">Ссылка</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">{{item.title}}</h5>
+        {% if item.attach != '' %}
+        {% set photos = item.attach.split('|') %}
+        <div id="Attacments{{ item.id }}" class="carousel slide" data-ride="carousel"
+             style="background-color: #eee; border-radius: 10px">
+            <ol class="carousel-indicators">
+                {% for c in range(photos|length) %}
+                {% if c == 0 %}
+                <li data-target="#Attacments{{ item.id }}" data-slide-to="{{ c }}" class="active"></li>
+                {% else %}
+                <li data-target="#Attacments{{ item.id }}" data-slide-to="{{ c }}"></li>
+                {% endif %}
+                {% endfor %}
+            </ol>
+            <div class="carousel-inner" style="padding: 5px">
+                {% for photo in photos %}
+                {% if photo == photos[0] %}
+                <div class="carousel-item active">
+                    <center>
+                        {% if photo.startswith('media') %}
+                        <a href="/static/attachments/{{ photo }}">
+                            <embed class="d-block w-50" src="/static/attachments/{{ photo }}">
+                        </a>
+                        {% else %}
+                        <a href="/static/attachments/{{ photo }}"><i class="far fa-file"></i> {{ photo }}</a>
+                        {% endif %}
+                    </center>
+                </div>
+                {% else %}
+                <div class="carousel-item">
+                    <center>
+                        {% if photo.startswith('media') %}
+                        <a href="/static/attachments/{{ photo }}">
+                            <embed class="d-block w-50" src="/static/attachments/{{ photo }}">
+                        </a>
+                        {% else %}
+                        <a href="/static/attachments/{{ photo }}"><i class="far fa-file"></i> {{ photo }}</a>
+                        {% endif %}
+                    </center>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <a class="carousel-control-prev" href="#Attacments{{ item.id }}" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Вперёд</span>
+            </a>
+            <a class="carousel-control-next" href="#Attacments{{ item.id }}" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Назад</span>
+            </a>
+        </div>
+        {% endif %}
+        <hr>
+        <p class="card-text">{{item.content}}</p>
+        {% if current_user.is_authenticated %}
+        {% if current_user.name in liked %}
+        <a href="/news/unlike/{{ item.id }}" class="btn btn-primary btn-sm">{{item.likes}} <i class="fas fa-heart"></i></a>
+        {% else %}
+        <a href="/news/like/{{ item.id }}" class="btn btn-outline-primary btn-sm">{{item.likes}} <i class="far fa-heart"></i></a>
+        {% endif %}
+        {% else %}
+        <button class="btn btn-outline-primary btn-sm">{{item.likes}} <i class="far fa-heart"></i></button>
+        {% endif %}
+
+
+        <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse"
+                data-target="#CommentsSpoiler{{ item.id }}"
+                aria-expanded="false" aria-controls="CommentsSpoiler{{ item.id }}">
+            Комментарии
+        </button>
+    </div>
+    <div class="collapse" id="CommentsSpoiler{{ item.id }}">
+        <div class="card-footer">
+            {% set cm = 0 %}
+            {% for c in comments %}
+            {% if c.to == item.id %}
+            {% set cm = cm + 1 %}
+            <div id="Comment{{ c.id }}" class="d-flex">
+                <div class="p-2">
+                    <img src="/static/userpics/{{ c.user.id }}.png" width="40px" height="40px"
+                         style="border-radius: 20px">
+                </div>
+                <div class="p-2">
+                    {% if c.user.is_admin %}
+                    <a href="/{{ c.user.id }}" class="btn btn-outline-danger btn-sm">{{c.user.name}}</a>
+                    {% endif %}
+                    {% if not c.user.is_admin %}
+                    <a href="/{{ c.user.id }}" class="btn btn-outline-primary btn-sm">{{c.user.name}}</a>
+                    {% endif %}
+                </div>
+                <div class="p-2">
+                    <p class="text-justify">{{ c.content }}</p>
+                </div>
+                {% if current_user.is_authenticated and ((current_user == c.user) or current_user.is_admin) %}
+                <div class="ml-auto p-2">
+                    <a href="/comments/delete/{{ c.id }}" class="btn btn-outline-danger btn-sm"><i class="fas fa-trash-alt"></i></a>
+                </div>
+                {% endif %}
+            </div>
+            <hr>
+            {% endif %}
+            {% endfor %}
+            {% if current_user.is_authenticated %}
+            <form action="" method="post">
+                {{ commsform.hidden_tag() }}
+                <p style="margin-bottom: 0px">
+                    {{ commsform.content.label }}<br>
+                    {{ commsform.content(class="form-control") }}<br>
+                    {% for error in commsform.content.errors %}
+                <p content="alert alert-danger" role="alert">
+                    {{ error }}
+                </p>
+                {% endfor %}
+                </p>
+                <p style="display: none">
+                    <label for="to">ToNewsId</label><br>
+                    <input class="form-control" id="to" name="to" type="text" value="{{ item.id }}"><br>
+                </p>
+                <p style="margin-bottom: 0px">{{ commsform.submit(type="submit", class="btn btn-primary") }}</p>
+                {{message}}
+            </form>
+            {% else %}
+            <a href="/register">Зарегистрируйтесь</a> или <a href="/login">войдите</a> чтобы отмечать и комментировать
+            новости.
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endfor %}
+
+{% endblock %}

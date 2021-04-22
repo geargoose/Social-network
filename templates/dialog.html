@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+<!--
+Страница "диалог"
+
+На этой странице выведены все сообщения между пользователями и
+выделенные цветами: синим - отправленные, серым - входящие.
+-->
+
+{% block content %}
+<div class="card" style="margin-top: 5px; padding: 10px;">
+    <h1><a href="/msg" class="btn btn-outline-primary">Назад</a> {{ title }}</h1>
+</div>
+
+<div class="card" style="margin-top: 5px;">
+    <div class="card-body">
+        <div class="container">
+            <div class="message_holder">
+                {% for item in messages %}
+                <div class="d-flex" style="margin-bottom: 1px;" id="msg_{{ item.id }}">
+                    {% if item.user.id == current_user.id %}
+                    <div class="p-2" style="background: #cfffff; border-radius: 5px;">
+                        <p id="my" style="margin-bottom: 0;">{{ item.content }}</p>
+                    </div>
+                    <div class="ml-auto p-2">
+                        <a href="/msg/{{ to }}/delete/{{ item.id }}" class="link" style="color: #f9f9f9">Удалить</a>
+                    </div>
+                    {% else %}
+                    <div class="ml-auto p-2" style="background: #ddd; border-radius: 5px;">
+                        <p id="other" style="margin-bottom: 0;">{{ item.content }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <form method="POST" action="">
+        <div class="clearfix" style="margin-top: 5px;"></div>
+        <input type="text" class="message form-control" placeholder="Введите текст сообщения">
+        <div style="padding-top: 5px;"></div>
+        <button type="submit" class="btn btn-success btn-block"><i class="fas fa-paper-plane"></i> Отправить
+        </button>
+    </form>
+</div>
+
+
+<script>
+      // var audio = new Audio('/static/system/new_message.mp3');
+      var socket = io.connect( 'http://' + document.domain + ':' + location.port )
+      // broadcast a message
+      socket.on( 'connect', function() {
+        // socket.emit( 'my event', {
+        //   data: 'User Connected'
+        // } )
+        var form = $( 'form' ).on( 'submit', function( e ) {
+          e.preventDefault()
+          let user_input = encodeURI($( 'input.message' ).val())
+          socket.emit( 'message', {
+            user_name : '{{ header }}',
+            from : '{{ current_user.id }}',
+            message : user_input
+          } )
+          // empty the input field
+          $( 'input.message' ).val( '' ).focus()
+        } )
+      } )
+
+      // capture message
+      socket.on( 'my response', function( msg ) {
+        console.log( msg )
+        if( typeof msg.user_name !== 'undefined' && msg.message !== '' && msg.user_name == '{{ header }}' ) {
+          if( msg.from == '{{ current_user.id }}') {
+            $( 'div.message_holder' ).append( '<div class="d-flex" style="margin-bottom: 1px;"><div class="p-2" style="background: #cfffff; border-radius: 5px;"><p id="my" style="margin-bottom: 0;">'+decodeURI(msg.message)+'</p></div></div>' )
+          } else {
+            // audio.play();
+            $( 'div.message_holder' ).append( '<div class="d-flex" style="margin-bottom: 1px;"><div class="ml-auto p-2" style="background: #ddd; border-radius: 5px;"><p id="other" style="margin-bottom: 0;">'+decodeURI(msg.message)+'</p></div></div>' )
+          }
+        }
+      } )
+
+</script>
+{% endblock %}

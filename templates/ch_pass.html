@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+<!--
+Страница "изменение пароля"
+
+С помощью этой формы пользователь может изменить свой пароль.
+-->
+
+{% block content %}
+<div class="card" style="margin-top: 5px; padding: 10px;">
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.password_old.label }}<br>
+            {{ form.password_old(class="form-control", type="password") }}<br>
+            {% for error in form.password.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(class="form-control", type="password") }}<br>
+            {% for error in form.password.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.password_again.label }}<br>
+            {{ form.password_again(class="form-control", type="password") }}<br>
+            {% for error in form.password.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+        <div>{{ message }}</div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,92 @@
+<!doctype html>
+
+<!--
+Базовый шаблон
+
+Базовый шаблон включает в себя все элементы, которые не меняются в зависимости
+от перехода по страницам сайта - "заголовок" сайта (верхняя панель), ярлыки регистрации и входа или
+чата, профиля и основной страницы.
+-->
+
+<html lang="ru">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="shortcut icon" href="/static/system/favicon.png" type="image/png">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+          crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+    <script src="https://kit.fontawesome.com/32e2967fe7.js" crossorigin="anonymous"></script>
+    <script allow="autoplay">
+        var audio = new Audio('/static/system/new_message.mp3');
+        var socket = io.connect( 'http://' + document.domain + ':' + location.port )
+
+        socket.on( 'my response', function( msg ) {
+          console.log( '{{ current_user.id }}' )
+          if ( typeof msg.user_name !== 'undefined' && msg.message !== '' && msg.user_name.includes('{{ current_user.id }}') ) {
+            if( msg.from !== '{{ current_user.id }}') {
+              audio.play();
+            }
+          }
+        })
+    </script>
+    <title>{{title}}</title>
+</head>
+<body style="background-image: url(/static/system/bg.jpg);">
+<header>
+    <nav class="navbar navbar-dark bg-primary" style="position: fixed; top: 0; right: 0; left: 0; z-index: 999;">
+        <a class="navbar-brand" href="#">Cоциальная сеть</a>
+        {% if current_user.is_authenticated %}
+        <center>
+            <div class="d-flex justify-content-between" style="width: 40vw;">
+                <div class="p-2">
+                    <a href="/{{ current_user.id }}" style="color: #fff"><h5 style="margin: 0px;"><i class="fas fa-user"></i></h5></a>
+                </div>
+                <div class="p-2">
+                    <a href="/feed" style="color: #fff"><h5 style="margin: 0px;"><i class="fas fa-home"></i></h5></a>
+                </div>
+                <div class="p-2">
+                    <a href="/msg" style="color: #fff"><h5 style="margin: 0px;"><i class="fas fa-comments"></i></h5></a>
+                </div>
+            </div>
+        </center>
+        <div class="nav-item dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {{ current_user.name }}
+            </button>
+            <div class="dropdown-menu dropdown-menu-left navbar-light" aria-labelledby="dropdownMenuButton">
+                <center>
+                    <a style="color: #000" class="navbar-brand" href="/{{ current_user.id }}">Профиль</a>
+                    <a style="color: #000" class="navbar-brand" href="/feed">Новости</a>
+                    <a style="color: #000" class="navbar-brand" href="/msg">Мессенджер</a>
+                    <a style="color: #000" class="navbar-brand" href="/logout">Выход</a>
+                </center>
+            </div>
+            <a href="/logout" style="color: #fff;"><i class="fas fa-sign-out-alt"></i></a>
+        </div>
+        {% else %}
+        <p style="margin-bottom: 0px">
+            <a class="btn btn-primary btn-sm" href="/register">Зарегистрироваться</a>
+            <a class="btn btn-success btn-sm" href="/login">Войти</a>
+        </p>
+        {% endif %}
+    </nav>
+</header>
+<!-- Begin page content -->
+<main role="main" class="container" style="padding-top: 60px;">
+    {% block content %}{% endblock %}
+</main>
+</body>
+</html>

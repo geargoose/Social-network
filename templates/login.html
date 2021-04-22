@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+<!--
+Страница "вход"
+
+С помощью этой формы пользователь входит в систему.
+-->
+
+{% block content %}
+<div class="card" style="margin-top: 5px; padding: 10px;">
+    <div class="card-body">
+        <ul class="nav nav-tabs" style="margin-top: 10px; margin-bottom: 10px;">
+            <li class="nav-item">
+                <a class="nav-link active" href="#">Вход</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/register">Регистрация</a>
+            </li>
+        </ul>
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.email.label }}<br>
+                {{ form.email(class="form-control", type="email") }}<br>
+                {% for error in form.email.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+            {% endfor %}
+            </p>
+            <p>
+                {{ form.password.label }}<br>
+                {{ form.password(class="form-control", type="password") }}<br>
+                {% for error in form.password.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+            {% endfor %}
+            </p>
+            <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+            <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+            <div>{{ message }}</div>
+        </form>
+    </div>
+</div>
+{% endblock %}
