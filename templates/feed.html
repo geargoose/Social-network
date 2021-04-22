@@ -138,7 +138,7 @@
                     <center>
                         {% if photo.startswith('media') %}
                         <a href="/static/attachments/{{ photo }}">
-                            <embed class="d-block w-50" src="/static/attachments/{{ photo }}">
+                            <embed muted class="d-block w-50" src="/static/attachments/{{ photo }}">
                         </a>
                         {% else %}
                         <a href="/static/attachments/{{ photo }}"><i class="far fa-file"></i> {{ photo }}</a>
@@ -150,7 +150,7 @@
                     <center>
                         {% if photo.startswith('media') %}
                         <a href="/static/attachments/{{ photo }}">
-                            <embed class="d-block w-50" src="/static/attachments/{{ photo }}">
+                            <embed muted class="d-block w-50" src="/static/attachments/{{ photo }}">
                         </a>
                         {% else %}
                         <a href="/static/attachments/{{ photo }}"><i class="far fa-file"></i> {{ photo }}</a>

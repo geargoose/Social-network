@@ -88,7 +88,8 @@ def index(prof_id):
     return render_template("profile.html",
                            news=news, form=form,
                            profile_id=prof_id, profile_user=prof_user,
-                           comments=comms, commsform=commsform
+                           comments=comms, commsform=commsform,
+                           title='Профиль'
                            )
 
 
@@ -123,7 +124,7 @@ def feed():
                     print(file.filename)
                     filename = secure_filename(
                         f'{str(time.time()).replace(".", "-")}-{file.filename}')
-                    ftype = ''
+                    ftype = ''  # Определяем тип файла для корректного отображения в браузере
                     if filename.endswith('png') or filename.endswith('jpg') \
                             or filename.endswith('jpeg') or filename.endswith('bmp') \
                             or filename.endswith('mp4') or filename.endswith('mov') \
@@ -159,7 +160,8 @@ def feed():
                            news=news,
                            form=form,
                            comments=comms,
-                           commsform=commsform)
+                           commsform=commsform,
+                           title='Новости на главной странице')
 
 
 @app.route('/register', methods=['GET', 'POST'])  # Регистрация
@@ -470,7 +472,7 @@ def add_msg(to):
         title = f'{current_user.id}_{to}'
     else:
         title = f'{to}_{current_user.id}'
-    return render_template('dialog.html', title=f'Чат с пользователем {who.name}',  # Немного красоты на странице
+    return render_template('dialog.html', title=f'Диалог с пользователем {who.name}',  # Немного красоты на странице
                            messages=message, to=to,
                            header=title)
 

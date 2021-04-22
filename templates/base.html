@@ -11,7 +11,7 @@
 <html lang="ru">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <link rel="shortcut icon" href="/static/system/favicon.png" type="image/png">
+    <link rel="shortcut icon" href="/static/system/logo.png" type="image/png">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
@@ -40,18 +40,23 @@
             }
           }
         })
+
     </script>
-    <title>{{title}}</title>
+    <title>Kotium Network {{title}}</title>
 </head>
 <body style="background-image: url(/static/system/bg.jpg);">
 <header>
     <nav class="navbar navbar-dark bg-primary" style="position: fixed; top: 0; right: 0; left: 0; z-index: 999;">
-        <a class="navbar-brand" href="#">Cоциальная сеть</a>
+        <div>
+            <img src="/static/system/logo.png" width="40px" height="40px">
+            <a class="navbar-brand" href="#" style="font-family: 'segoe print';">Kotium network</a>
+        </div>
         {% if current_user.is_authenticated %}
         <center>
             <div class="d-flex justify-content-between" style="width: 40vw;">
                 <div class="p-2">
-                    <a href="/{{ current_user.id }}" style="color: #fff"><h5 style="margin: 0px;"><i class="fas fa-user"></i></h5></a>
+                    <a href="/{{ current_user.id }}" style="color: #fff"><h5 style="margin: 0px;"><i
+                            class="fas fa-user"></i></h5></a>
                 </div>
                 <div class="p-2">
                     <a href="/feed" style="color: #fff"><h5 style="margin: 0px;"><i class="fas fa-home"></i></h5></a>
